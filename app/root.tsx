@@ -1,3 +1,5 @@
+import "./index.css";
+
 import {
   Links,
   Meta,
@@ -6,16 +8,18 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
+import { Spinner } from "flowbite-react";
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-slate-900 text-white">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -29,5 +33,9 @@ export default function App() {
 }
 
 export function HydrateFallback() {
-  return <p>Loading...</p>;
+  return (
+    <div className="fixed inset-0 flex items-center justify-center">
+      <Spinner />
+    </div>
+  );
 }
