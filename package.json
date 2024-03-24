@@ -13,8 +13,8 @@
   "dependencies": {
     "@remix-run/node": "^2.8.1",
     "@remix-run/react": "^2.8.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "18.3.0-canary-670811593-20240322",
+    "react-dom": "18.3.0-canary-670811593-20240322"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.8.1",
