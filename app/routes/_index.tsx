@@ -1,9 +1,11 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
-import { User } from "firebase/auth";
+import { Await, Form, Link, defer, useLoaderData } from "@remix-run/react";
+import { get } from "firebase/database";
 import { Button } from "flowbite-react";
-import { auth, authStateAvailablePromise } from "~/firebase.client";
-import { forceType } from "~/forceType";
+import { Suspense } from "react";
+import { getRoom } from "~/getRoomRef";
+import { getCurrentUser } from "../getCurrentUser";
+import { Container } from "../ui/Container";
 
 export const meta: MetaFunction = () => {
   return [
@@ -13,27 +15,19 @@ export const meta: MetaFunction = () => {
 };
 
 export const clientLoader = async () => {
-  await authStateAvailablePromise;
-  return { user: auth.currentUser };
+  const user = await getCurrentUser();
+  const isAdminPromise = Promise.resolve().then(() =>
+    user
+      ? get(
+          getRoom().child("admins").child(user.uid).child("enabled").ref
+        ).then((s) => s.val() === true)
+      : false
+  );
+  return defer({ user, isAdminPromise });
 };
 
-export interface Container {
-  children?: React.ReactNode;
-}
-
-export function Container(props: Container) {
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <h1 className="mb-6 pb-1 border-b border-b-slate-700 text-slate-500">
-        Code in the Wind
-      </h1>
-      {props.children}
-    </div>
-  );
-}
-
 export default function Index() {
-  const { user } = useLoaderData<typeof clientLoader>();
+  const { user, isAdminPromise } = useLoaderData<typeof clientLoader>();
   if (!user) {
     const loginUrl = `https://creatorsgarten.org/auth/authorize?${new URLSearchParams(
       {
@@ -60,12 +54,12 @@ export default function Index() {
     );
   }
 
-  forceType<User>(user);
   return (
     <Container>
       <div className="flex gap-4 flex-col">
         <div className="text-2xl font-bold">Welcome!</div>
         <div>User ID: {user.uid}</div>
+        <div>User name: {user.name}</div>
         <div className="flex gap-3">
           <Button as={Link} to="/editor">
             Go to editor
@@ -75,6 +69,17 @@ export default function Index() {
               Log out
             </Button>
           </Form>
+          <Suspense fallback="">
+            <Await resolve={isAdminPromise}>
+              {(isAdmin) =>
+                isAdmin ? (
+                  <Button as={Link} to="/admin" color="gray">
+                    Admin
+                  </Button>
+                ) : null
+              }
+            </Await>
+          </Suspense>
         </div>
       </div>
     </Container>
