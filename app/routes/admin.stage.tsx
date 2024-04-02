@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { Suspense, lazy, useMemo } from "react";
 import { getRoom } from "~/getRoomRef";
 import { submissionDataSchema, submissionSchema } from "~/schema";
 import { Previewer } from "~/ui/Previewer";
@@ -16,6 +16,8 @@ export interface Contestant {
   userId: string;
 }
 
+const HighlightedHtml = lazy(() => import("~/ui/HighlightedHtml"));
+
 export function Contestant(props: Contestant) {
   const submissionPtr = getRoom()
     .child("privateSubmissions")
@@ -25,13 +27,16 @@ export function Contestant(props: Contestant) {
     const submission = submissionSchema.parse(
       submissionState.data || undefined
     );
-    console.log(submission);
+    // console.log(submission);
     const data = submissionDataSchema.parse(JSON.parse(submission.data));
     return data.html;
   }, [submissionState]);
   return (
     <div>
       <Previewer html={html} />
+      <Suspense fallback="Loading...">
+        <HighlightedHtml html={html} />
+      </Suspense>
     </div>
   );
 }

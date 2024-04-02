@@ -11,6 +11,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@dtinth/tailwindcss-standalone": "0.0.0-2",
     "@nanostores/react": "^0.7.2",
     "@remix-run/node": "^2.8.1",
     "@remix-run/react": "^2.8.1",
@@ -20,6 +21,7 @@
     "nanostores": "^0.10.0",
     "react": "18.3.0-canary-670811593-20240322",
     "react-dom": "18.3.0-canary-670811593-20240322",
+    "shiki": "^1.2.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
