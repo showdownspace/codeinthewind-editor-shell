@@ -1,10 +1,14 @@
+import {
+  getFirebaseDatabaseQueryStore,
+  mapObservableResult,
+} from "@nanofire/database";
 import { useStore } from "@nanostores/react";
 import { DatabaseReference } from "firebase/database";
 import { useMemo } from "react";
-import { getFirebaseDatabaseQueryStore, mapObservableResult } from "./nanofire";
 
 export function useFirebaseDatabaseQuery<T>(ref: DatabaseReference) {
-  const result = useStore(getFirebaseDatabaseQueryStore(ref));
+  const store = getFirebaseDatabaseQueryStore(ref);
+  const result = useStore(store);
   return useMemo(() => {
     return mapObservableResult(result, (data) => data.val() as T);
   }, [result]);

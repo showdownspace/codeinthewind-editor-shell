@@ -3,6 +3,7 @@ import { Table } from "flowbite-react";
 import { useEffect, useMemo, useState } from "react";
 import { getRoom } from "~/getRoomRef";
 import { profilesSchema } from "~/schema";
+import { UserId } from "~/ui/UserId";
 import { useFirebaseDatabaseQuery } from "~/utils/useFirebaseDatabaseQuery";
 
 export default function AdminUsersPage() {
@@ -21,7 +22,9 @@ export default function AdminUsersPage() {
         <Table.Body>
           {Object.entries(users).map(([id, user]) => (
             <Table.Row key={id}>
-              <Table.Cell>{id}</Table.Cell>
+              <Table.Cell>
+                <UserId id={id} />
+              </Table.Cell>
               <Table.Cell>
                 <div className="flex items-center gap-2">
                   <OnlineBadge userId={id} /> {user.name}

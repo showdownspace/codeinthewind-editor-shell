@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@dtinth/tailwindcss-standalone": "0.0.0-2",
+    "@nanofire/database": "npm:@jsr/nanofire__database@0.1.3",
     "@nanostores/react": "^0.7.2",
     "@remix-run/node": "^2.8.1",
     "@remix-run/react": "^2.8.1",
