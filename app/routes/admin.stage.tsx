@@ -1,11 +1,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import clsx from "clsx";
-import { Suspense, lazy, useMemo, useState } from "react";
-import { getRoom } from "~/getRoomRef";
-import { submissionDataSchema, submissionSchema } from "~/schema";
+import { Suspense, lazy, useState } from "react";
 import { Previewer } from "~/ui/Previewer";
-import { useFirebaseDatabaseQuery } from "~/utils/useFirebaseDatabaseQuery";
+import { useContestantHtml } from "../utils/useContestantHtml";
 import { useStage } from "../utils/useStage";
 
 const itemWidth = 360;
@@ -50,11 +48,15 @@ export function Slot(props: Slot) {
         {hasUser ? (
           <div
             className={clsx(
-              "absolute left-[180px] top-[180px] bottom-[180px] w-[960px] overflow-auto bg-[#24292e] -m-1 p-3 border-4 border-slate-500 transition-all duration-500",
+              "absolute left-[180px] top-[180px] bottom-[180px] w-[960px] transition-all duration-500",
               show ? "translate-x-0" : "-translate-x-40"
             )}
           >
-            <ContestantHtml userId={props.userId} />
+            <div className="absolute -inset-1 bg-gradient-to-bl from-green-300 to-green-700">
+              <div className="absolute inset-1 overflow-auto bg-[#24292e] p-3">
+                <ContestantHtml userId={props.userId} />
+              </div>
+            </div>
           </div>
         ) : null}
       </div>
@@ -74,8 +76,10 @@ export function Slot(props: Slot) {
       >
         <div className="origin-top-left scale-[--s] top-0 left-0 w-[540px] h-[720px] transition-all duration-500">
           {hasUser ? (
-            <div className="absolute -inset-1 bg-black/20 border-4 border-[#B7FEF6] shadow-lg transition-all duration-500">
-              <ContestantPreview userId={props.userId} />
+            <div className="absolute -inset-1 shadow-lg transition-all duration-500 bg-gradient-to-br from-[#A1FDF6] to-[#2C4653]">
+              <div className="absolute inset-1 bg-black">
+                <ContestantPreview userId={props.userId} />
+              </div>
               <div className="absolute inset-0 cursor-pointer"></div>
             </div>
           ) : (
@@ -95,7 +99,7 @@ const defaultHtml =
   '<div class="bg-slate-700 text-white fixed inset-0 flex flex-col text-center justify-center"><div class="text-5xl">No signal</div></div>';
 
 export function ContestantPreview(props: ContestantPreview) {
-  const html = useHtml(props.userId);
+  const html = useContestantHtml(props.userId);
   return <Previewer html={html || defaultHtml} />;
   //   <>
   //     {props.children(
@@ -112,7 +116,7 @@ export interface ContestantHtml {
 const HighlightedHtml = lazy(() => import("~/ui/HighlightedHtml"));
 
 export function ContestantHtml(props: ContestantHtml) {
-  const html = useHtml(props.userId);
+  const html = useContestantHtml(props.userId);
   return (
     <>
       <Suspense fallback="Loading...">
@@ -120,17 +124,4 @@ export function ContestantHtml(props: ContestantHtml) {
       </Suspense>
     </>
   );
-}
-
-function useHtml(userId: string) {
-  const submissionPtr = getRoom().child("privateSubmissions").child(userId);
-  const submissionState = useFirebaseDatabaseQuery(submissionPtr.ref);
-  const html = useMemo(() => {
-    const submission = submissionSchema.parse(
-      submissionState.data || undefined
-    );
-    const data = submissionDataSchema.parse(JSON.parse(submission.data));
-    return data.html;
-  }, [submissionState]);
-  return html;
 }
