@@ -6,6 +6,7 @@ import { getRoom } from "~/getRoomRef";
 import { submissionDataSchema, submissionSchema } from "~/schema";
 import { Previewer } from "~/ui/Previewer";
 import { useFirebaseDatabaseQuery } from "~/utils/useFirebaseDatabaseQuery";
+import { useStage } from "../utils/useStage";
 
 const itemWidth = 360;
 const totalWidth = itemWidth * 4 + 32 * 3;
@@ -13,11 +14,7 @@ const itemHeight = 480;
 const totalHeight = itemHeight * 2 + 32;
 
 export default function AdminStagePage() {
-  const stage =
-    useFirebaseDatabaseQuery<string>(
-      getRoom().child("settings").child("stage").ref
-    ).data || "-,-,-,-,-,-,-,-";
-  const userIds = stage.split(",");
+  const userIds = useStage();
   return (
     <div className="fixed inset-0 bg-black">
       <div className="w-[1920px] h-[1080px] bg-gradient-to-b from-black to-neutral-800 relative">

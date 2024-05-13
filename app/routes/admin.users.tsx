@@ -6,6 +6,7 @@ import { getRoom } from "~/getRoomRef";
 import { profilesSchema } from "~/schema";
 import { UserId } from "~/ui/UserId";
 import { useFirebaseDatabaseQuery } from "~/utils/useFirebaseDatabaseQuery";
+import { useStage } from "~/utils/useStage";
 
 export default function AdminUsersPage() {
   const profilesPtr = getRoom().child("profiles");
@@ -15,6 +16,9 @@ export default function AdminUsersPage() {
   }, [userState.data]);
   return (
     <>
+      <StageDump users={users} />
+      <div className="h-6" />
+
       <Table>
         <Table.Head>
           <Table.HeadCell>ID</Table.HeadCell>
@@ -39,6 +43,27 @@ export default function AdminUsersPage() {
           ))}
         </Table.Body>
       </Table>
+    </>
+  );
+}
+
+interface StageDump {
+  users: Record<string, { name: string }>;
+}
+function StageDump(props: StageDump) {
+  const stage = useStage();
+  const value = stage
+    .map((userId, index) => {
+      const user = userId ? props.users[userId] : undefined;
+      return [index + 1, userId || "-", user ? user.name : "-"].join("\t");
+    })
+    .join("\n");
+  return (
+    <>
+      <textarea
+        value={value}
+        className="bg-black text-green-300 w-full h-[15em]"
+      />
     </>
   );
 }
@@ -84,11 +109,8 @@ export interface StageSelect {
 }
 
 export function StageSelect(props: StageSelect) {
-  const stage =
-    useFirebaseDatabaseQuery<string>(
-      getRoom().child("settings").child("stage").ref
-    ).data || "-,-,-,-,-,-,-,-";
-  const index = stage.split(",").indexOf(props.userId);
+  const userIds = useStage();
+  const index = userIds.indexOf(props.userId);
   return (
     <Select
       sizing="sm"
