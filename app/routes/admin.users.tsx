@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
-import { Table } from "flowbite-react";
+import { runTransaction } from "firebase/database";
+import { Select, Table } from "flowbite-react";
 import { useEffect, useMemo, useState } from "react";
 import { getRoom } from "~/getRoomRef";
 import { profilesSchema } from "~/schema";
@@ -18,6 +19,7 @@ export default function AdminUsersPage() {
         <Table.Head>
           <Table.HeadCell>ID</Table.HeadCell>
           <Table.HeadCell>Name</Table.HeadCell>
+          <Table.HeadCell>Stage</Table.HeadCell>
         </Table.Head>
         <Table.Body>
           {Object.entries(users).map(([id, user]) => (
@@ -29,6 +31,9 @@ export default function AdminUsersPage() {
                 <div className="flex items-center gap-2">
                   <OnlineBadge userId={id} /> {user.name}
                 </div>
+              </Table.Cell>
+              <Table.Cell>
+                <StageSelect userId={id} />
               </Table.Cell>
             </Table.Row>
           ))}
@@ -72,4 +77,44 @@ function useNow() {
     return () => clearInterval(interval);
   }, []);
   return now;
+}
+
+export interface StageSelect {
+  userId: string;
+}
+
+export function StageSelect(props: StageSelect) {
+  const stage =
+    useFirebaseDatabaseQuery<string>(
+      getRoom().child("settings").child("stage").ref
+    ).data || "-,-,-,-,-,-,-,-";
+  const index = stage.split(",").indexOf(props.userId);
+  return (
+    <Select
+      sizing="sm"
+      value={index === -1 ? "" : index + 1}
+      onChange={(e) => {
+        updateStage((+e.target.value || 0) - 1, props.userId);
+      }}
+    >
+      <option value="">—</option>
+      {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        <option key={i} value={i}>
+          {i}
+        </option>
+      ))}
+    </Select>
+  );
+}
+
+function updateStage(index: number, userId: string) {
+  runTransaction(
+    getRoom().child("settings").child("stage").ref,
+    (stage: string) => {
+      stage = stage || "-,-,-,-,-,-,-,-";
+      const values = stage.split(",").map((x) => (x === userId ? "-" : x));
+      if (index > -1) values[index] = userId;
+      return values.join(",");
+    }
+  );
 }

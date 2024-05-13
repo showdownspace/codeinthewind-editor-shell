@@ -37,6 +37,7 @@ export const roomSchema = withDefault(
     settings: withDefault(
       z.object({
         acceptingSubmissions: withDefault(z.boolean(), false),
+        stage: withDefault(z.string(), "-,-,-,-,-,-,-,-"),
       }),
       {}
     ),
