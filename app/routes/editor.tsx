@@ -4,6 +4,7 @@ import { get, serverTimestamp, set } from "firebase/database";
 import { atom } from "nanostores";
 import { useEffect, useRef } from "react";
 import { getCurrentUser } from "~/getCurrentUser";
+import { UserId } from "~/ui/UserId";
 import { getRoom } from "../getRoomRef";
 
 const $status = atom("…");
@@ -152,10 +153,20 @@ export default function Editor() {
 
 export function Header() {
   const status = useStore($status);
+  const { user } = useLoaderData<typeof clientLoader>();
   return (
     <>
-      <div className="absolute top-2 left-2">
-        <strong>Code in the Wind</strong> - {status}
+      <div className="absolute top-2 left-5 pl-0.5">
+        <div className="text-sm">
+          <strong>Code in the Wind</strong>
+          <span className="text-gray-400"> - {status}</span>
+        </div>
+        <div className="text-sky-400">
+          {user.name}{" "}
+          <span className="text-green-400">
+            <UserId id={user.uid} compact />
+          </span>
+        </div>
       </div>
     </>
   );

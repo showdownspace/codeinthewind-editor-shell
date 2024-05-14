@@ -67,13 +67,15 @@ export default function Index() {
     <Container>
       <div className="flex gap-4 flex-col">
         <div className="text-2xl font-bold">Welcome!</div>
-        <div>
-          User ID: <UserId id={user.uid} />
+        <div className="sm:text-5xl text-sky-400">
+          {user.name}{" "}
+          <span className="text-green-400">
+            <UserId id={user.uid} compact />
+          </span>
         </div>
-        <div>User name: {user.name}</div>
         <div className="flex gap-3">
-          <Button as={Link} to="/editor">
-            {n.state === "loading" ? "Loading" : "Go to editor"}
+          <Button as={Link} to="/editor" isProcessing={n.state === "loading"}>
+            Go to editor
           </Button>
           <Form method="post" action="/auth/logout">
             <Button type="submit" color="gray">

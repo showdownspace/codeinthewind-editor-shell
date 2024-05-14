@@ -9,6 +9,7 @@ import { useFirebaseDatabaseQuery } from "~/utils/useFirebaseDatabaseQuery";
 import { useStage } from "~/utils/useStage";
 
 export default function AdminUsersPage() {
+  const [showFullId, setShowFullId] = useState(false);
   const profilesPtr = getRoom().child("profiles");
   const userState = useFirebaseDatabaseQuery(profilesPtr.ref);
   const users = useMemo(() => {
@@ -16,12 +17,14 @@ export default function AdminUsersPage() {
   }, [userState.data]);
   return (
     <>
-      <StageDump users={users} />
+      <StageDump users={users} showFullId={showFullId} />
       <div className="h-6" />
 
       <Table>
         <Table.Head>
-          <Table.HeadCell>ID</Table.HeadCell>
+          <Table.HeadCell onClick={() => setShowFullId((x) => !x)}>
+            ID
+          </Table.HeadCell>
           <Table.HeadCell>Name</Table.HeadCell>
           <Table.HeadCell>Stage</Table.HeadCell>
         </Table.Head>
@@ -29,7 +32,7 @@ export default function AdminUsersPage() {
           {Object.entries(users).map(([id, user]) => (
             <Table.Row key={id}>
               <Table.Cell>
-                <UserId id={id} />
+                {showFullId ? <UserId id={id} /> : id.slice(-4)}
               </Table.Cell>
               <Table.Cell>
                 <div className="flex items-center gap-2">
@@ -49,13 +52,20 @@ export default function AdminUsersPage() {
 
 interface StageDump {
   users: Record<string, { name: string }>;
+  showFullId: boolean;
 }
 function StageDump(props: StageDump) {
   const stage = useStage();
   const value = stage
     .map((userId, index) => {
       const user = userId ? props.users[userId] : undefined;
-      return [index + 1, userId || "-", user ? user.name : "-"].join("\t");
+      return [
+        index + 1,
+        (props.showFullId ? (x: string) => x : (x: string) => x.slice(-4))(
+          userId || "-"
+        ),
+        user ? user.name : "-",
+      ].join("\t");
     })
     .join("\n");
   return (

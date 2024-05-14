@@ -5,6 +5,8 @@ export default function AdminIndex() {
     <>
       <Link to="/admin/users">Users</Link>
       <br />
+      <Link to="/admin/submissions">Submissions</Link>
+      <br />
       <Link to="/admin/stage">Stage</Link>
     </>
   );

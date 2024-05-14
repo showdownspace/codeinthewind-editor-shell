@@ -1,5 +1,6 @@
 export interface UserId {
   id: string;
+  compact?: boolean;
 }
 export function UserId(props: UserId) {
   let back = "";
@@ -7,7 +8,9 @@ export function UserId(props: UserId) {
     back = match;
     return "";
   });
-  return (
+  return props.compact ? (
+    <>{back}</>
+  ) : (
     <>
       {front}
       <u>{back}</u>
