@@ -13,3 +13,13 @@ const getRoomRef = once(() => {
 export const getRoom = once(() => {
   return new ZDbRef<z.infer<typeof roomSchema>>(getRoomRef(), roomSchema);
 });
+
+const getVoteRoomRef = once(() => {
+  const dbRef = ref(getDatabase());
+  const roomRef = child(dbRef, `rooms/citw2vote`);
+  return roomRef;
+});
+
+export const getVoteRoom = once(() => {
+  return new ZDbRef<z.infer<typeof roomSchema>>(getVoteRoomRef(), roomSchema);
+});

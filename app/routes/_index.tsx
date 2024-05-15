@@ -1,12 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
-import {
-  Await,
-  Form,
-  Link,
-  defer,
-  useLoaderData,
-  useNavigation,
-} from "@remix-run/react";
+import { Await, Form, Link, defer, useLoaderData } from "@remix-run/react";
 import { get } from "firebase/database";
 import { Button } from "flowbite-react";
 import { Suspense } from "react";
@@ -35,7 +28,6 @@ export const clientLoader = async () => {
 };
 
 export default function Index() {
-  const n = useNavigation();
   const { user, isAdminPromise } = useLoaderData<typeof clientLoader>();
   if (!user) {
     const loginUrl = `https://creatorsgarten.org/auth/authorize?${new URLSearchParams(
@@ -74,8 +66,11 @@ export default function Index() {
           </span>
         </div>
         <div className="flex gap-3">
-          <Button as={Link} to="/editor" isProcessing={n.state === "loading"}>
+          <Button as={Link} to="/editor">
             Go to editor
+          </Button>
+          <Button as={Link} to="/vote" color="gray">
+            Vote
           </Button>
           <Form method="post" action="/auth/logout">
             <Button type="submit" color="gray">

@@ -7,16 +7,16 @@ export class ZDbRef<T> {
   constructor(public ref: DatabaseReference, public schema: z.ZodTypeAny) {}
   child<K extends T extends object ? keyof T : never>(key: K): ZDbRef<T[K]> {
     const childSchema = isSchemaObject(this.schema)
-      ? this.schema._def.shape()[key as string]
+      ? this.schema.shape[key as string]
       : isSchemaRecord(this.schema)
-      ? this.schema._def.valueType
+      ? this.schema.valueSchema
       : unknownSchema;
     return new ZDbRef(child(this.ref, key as string), childSchema);
   }
 }
 const isSchemaObject = (schema: z.ZodTypeAny): schema is z.AnyZodObject => {
-  return "shape" in schema._def;
+  return "shape" in schema;
 };
 const isSchemaRecord = (schema: z.ZodTypeAny): schema is z.ZodRecord => {
-  return "valueType" in schema._def;
+  return "valueSchema" in schema;
 };
