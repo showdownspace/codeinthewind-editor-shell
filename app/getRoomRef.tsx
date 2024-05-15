@@ -1,5 +1,4 @@
 import { child, getDatabase, ref } from "firebase/database";
-import { z } from "zod";
 import { once } from "~/utils/once";
 import { ZDbRef } from "./ZDbRef";
 import { roomSchema } from "./schema";
@@ -11,7 +10,7 @@ const getRoomRef = once(() => {
 });
 
 export const getRoom = once(() => {
-  return new ZDbRef<z.infer<typeof roomSchema>>(getRoomRef(), roomSchema);
+  return new ZDbRef(getRoomRef(), roomSchema);
 });
 
 const getVoteRoomRef = once(() => {
@@ -21,5 +20,5 @@ const getVoteRoomRef = once(() => {
 });
 
 export const getVoteRoom = once(() => {
-  return new ZDbRef<z.infer<typeof roomSchema>>(getVoteRoomRef(), roomSchema);
+  return new ZDbRef(getVoteRoomRef(), roomSchema);
 });

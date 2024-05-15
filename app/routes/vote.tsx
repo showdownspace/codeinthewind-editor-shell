@@ -2,11 +2,11 @@ import { redirect, useLoaderData } from "@remix-run/react";
 import { serverTimestamp, set } from "firebase/database";
 import { Button } from "flowbite-react";
 import { useMemo } from "react";
+import { usePtr } from "~/ZDbRef";
 import { getCurrentUser } from "~/getCurrentUser";
 import { getVoteRoom } from "~/getRoomRef";
 import { submissionSchema } from "~/schema";
 import { Container } from "~/ui/Container";
-import { useFirebaseDatabaseQuery } from "~/utils/useFirebaseDatabaseQuery";
 
 export const clientLoader = async () => {
   const user = await getCurrentUser();
@@ -23,10 +23,8 @@ export default function VotePage() {
   const acceptingPtr = voteRoomPtr
     .child("settings")
     .child("acceptingSubmissions");
-  const accepting = useFirebaseDatabaseQuery(acceptingPtr.ref).data
-    ? true
-    : false;
-  const submission = useFirebaseDatabaseQuery(submissionPtr.ref);
+  const accepting = !!usePtr(acceptingPtr).data;
+  const submission = usePtr(submissionPtr);
   const submitVote = async (value: string) => {
     console.log(value);
     await set(submissionPtr.ref, {
@@ -51,7 +49,6 @@ export default function VotePage() {
       submitVote([...voted, value].slice(-2).join(","));
     }
   };
-  console.log(voted);
 
   return (
     <Container>

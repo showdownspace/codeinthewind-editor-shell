@@ -3,6 +3,7 @@
 import { set } from "firebase/database";
 import { Button, Table } from "flowbite-react";
 import { useMemo } from "react";
+import { usePtr } from "~/ZDbRef";
 import { getVoteRoom } from "~/getRoomRef";
 import { useFirebaseDatabaseQuery } from "~/utils/useFirebaseDatabaseQuery";
 
@@ -50,11 +51,10 @@ export default function AdminVote() {
 
 function VoteList() {
   const submissionsPtr = getVoteRoom().child("privateSubmissions");
-  const submissionsState = useFirebaseDatabaseQuery(submissionsPtr.ref);
+  const submissionsState = usePtr(submissionsPtr);
   const votes = useMemo(() => {
-    const data = submissionsPtr.schema.parse(
-      submissionsState.data ?? {}
-    ) as Record<string, { data: string }>;
+    console.log(submissionsState);
+    const data = submissionsState.data || {};
     const tally = new Map<number, string[]>();
     for (const [uid, submission] of Object.entries(data)) {
       for (const vote of new Set(
@@ -74,7 +74,7 @@ function VoteList() {
       id: x,
       votes: tally.get(x) || [],
     }));
-  }, [submissionsState.data, submissionsPtr.schema]);
+  }, [submissionsState]);
   const value = votes.map((vote) => vote.votes.length).join("\n");
   return (
     <>
@@ -95,6 +95,7 @@ function VoteList() {
       <div className="flex gap-2 mt-4">
         <textarea
           value={value}
+          readOnly
           className="bg-black text-green-300 w-full h-[15em]"
         />
       </div>

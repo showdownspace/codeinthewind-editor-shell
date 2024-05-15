@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { Checkbox, Label } from "flowbite-react";
 import { useMemo, useState } from "react";
+import { usePtr } from "~/ZDbRef";
 import { getRoom } from "~/getRoomRef";
 import { Previewer } from "~/ui/Previewer";
 import { useContestantHtml } from "~/utils/useContestantHtml";
@@ -26,7 +27,7 @@ export default function AdminSubmissions() {
 
 function SubmissionList() {
   const submissionsPtr = getRoom().child("privateSubmissions");
-  const submissionsState = useFirebaseDatabaseQuery(submissionsPtr.ref);
+  const submissionsState = usePtr(submissionsPtr);
   const submissions = useMemo(() => {
     return submissionsPtr.schema.parse(submissionsState.data ?? {});
   }, [submissionsState.data, submissionsPtr.schema]);
