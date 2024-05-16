@@ -3,7 +3,7 @@ import { Link } from "@remix-run/react";
 export default function AdminIndex() {
   return (
     <>
-      <Link to="/admin/users">Users</Link>
+      <Link to="/admin/dashboard">Dashboard</Link>
       <br />
       <Link to="/admin/submissions">Submissions</Link>
       <br />

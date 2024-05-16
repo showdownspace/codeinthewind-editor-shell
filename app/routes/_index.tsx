@@ -1,8 +1,16 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Await, Form, Link, defer, useLoaderData } from "@remix-run/react";
-import { get } from "firebase/database";
-import { Button } from "flowbite-react";
-import { Suspense } from "react";
+import {
+  Await,
+  ClientActionFunctionArgs,
+  Form,
+  Link,
+  defer,
+  useLoaderData,
+} from "@remix-run/react";
+import { get, set } from "firebase/database";
+import { Button, TextInput } from "flowbite-react";
+import { ReactNode, Suspense } from "react";
+import { usePtr } from "~/ZDbRef";
 import { getRoom } from "~/getRoomRef";
 import { UserId } from "~/ui/UserId";
 import { getCurrentUser } from "../getCurrentUser";
@@ -25,6 +33,19 @@ export const clientLoader = async () => {
       : false
   );
   return defer({ user, isAdminPromise });
+};
+
+export const clientAction = async (args: ClientActionFunctionArgs) => {
+  const formData = await args.request.formData();
+  const displayName = formData.get("displayName") as string | null;
+  const user = await getCurrentUser();
+  if (user) {
+    await set(
+      getRoom().child("profiles").child(user.uid).child("displayName").ref,
+      displayName
+    );
+  }
+  return null;
 };
 
 export default function Index() {
@@ -60,12 +81,14 @@ export default function Index() {
       <div className="flex gap-4 flex-col">
         <div className="text-2xl font-bold">Welcome!</div>
         <div className="sm:text-5xl text-sky-400">
-          {user.name}{" "}
+          <ProfileConnector uid={user.uid}>
+            {(profile) => profile.displayName || profile.name || user.name}
+          </ProfileConnector>{" "}
           <span className="text-green-400">
             <UserId id={user.uid} compact />
           </span>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <Button as={Link} to="/editor">
             Go to editor
           </Button>
@@ -89,7 +112,53 @@ export default function Index() {
             </Await>
           </Suspense>
         </div>
+        <Form method="post" className="flex gap-3 flex-wrap">
+          <ProfileConnector uid={user.uid}>
+            {(profile, loading) =>
+              loading ? (
+                ""
+              ) : (
+                <div className="text-sm text-gray-400">
+                  <TextInput
+                    name="displayName"
+                    placeholder={user.name}
+                    size={32}
+                    defaultValue={profile.displayName}
+                  />
+                </div>
+              )
+            }
+          </ProfileConnector>
+          <Button type="submit" color="blue" outline>
+            Change display name
+          </Button>
+        </Form>
       </div>
     </Container>
+  );
+}
+
+export interface ProfileConnector {
+  uid: string;
+  children: (
+    profile: { displayName?: string; name?: string },
+    loading: boolean
+  ) => ReactNode;
+}
+
+export function ProfileConnector(props: ProfileConnector) {
+  const profilePtr = getRoom().child("profiles").child(props.uid);
+  const state = usePtr(profilePtr);
+  const data = state.data;
+  return (
+    <>
+      {props.children(
+        {
+          displayName: data?.displayName || undefined,
+          name: data?.name,
+        },
+        state.loading
+      )}
+    </>
   );
 }

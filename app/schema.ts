@@ -8,7 +8,10 @@ function withDefault<T extends z.ZodTypeAny>(
 }
 
 export const profileSchema = withDefault(
-  z.object({ name: withDefault(z.string(), "-") }),
+  z.object({
+    name: withDefault(z.string(), "-"),
+    displayName: z.string().nullish(),
+  }),
   {}
 );
 
@@ -38,6 +41,7 @@ export const roomSchema = withDefault(
       z.object({
         acceptingSubmissions: withDefault(z.boolean(), false),
         stage: withDefault(z.string(), "-,-,-,-,-,-,-,-"),
+        challengeUrl: z.string().nullish(),
       }),
       {}
     ),

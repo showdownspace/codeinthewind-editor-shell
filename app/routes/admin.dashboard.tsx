@@ -36,7 +36,10 @@ export default function AdminUsersPage() {
               </Table.Cell>
               <Table.Cell>
                 <div className="flex items-center gap-2">
-                  <OnlineBadge userId={id} /> {user.name}
+                  <OnlineBadge userId={id} />{" "}
+                  {user.displayName
+                    ? `${user.displayName} (${user.name})`
+                    : user.name}
                 </div>
               </Table.Cell>
               <Table.Cell>

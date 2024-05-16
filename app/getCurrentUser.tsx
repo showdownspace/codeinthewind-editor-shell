@@ -15,8 +15,11 @@ export async function getCurrentUser() {
 
   if (user && !profileSaveAttempted) {
     profileSaveAttempted = true;
-    const profilePtr = getRoom().child("profiles").child(user.uid);
-    set(profilePtr.ref, { name: user.name }).catch(console.error);
+    const profilePtr = getRoom()
+      .child("profiles")
+      .child(user.uid)
+      .child("name");
+    set(profilePtr.ref, user.name).catch(console.error);
   }
 
   return user;
