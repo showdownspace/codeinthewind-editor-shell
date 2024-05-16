@@ -1,12 +1,15 @@
 import { clsx } from "clsx";
-import { runTransaction } from "firebase/database";
-import { Select, Table } from "flowbite-react";
-import { useEffect, useMemo, useState } from "react";
+import { runTransaction, set } from "firebase/database";
+import { Button, Select, Table } from "flowbite-react";
+import { useMemo, useState } from "react";
+import { usePtr } from "~/ZDbRef";
 import { getRoom } from "~/getRoomRef";
 import { profilesSchema } from "~/schema";
 import { UserId } from "~/ui/UserId";
 import { useFirebaseDatabaseQuery } from "~/utils/useFirebaseDatabaseQuery";
+import { useNow } from "~/utils/useNow";
 import { useStage } from "~/utils/useStage";
+import { Timer } from "../ui/Timer";
 
 export default function AdminUsersPage() {
   const [showFullId, setShowFullId] = useState(false);
@@ -18,6 +21,8 @@ export default function AdminUsersPage() {
   return (
     <>
       <StageDump users={users} showFullId={showFullId} />
+      <div className="h-6" />
+      <TimerAdmin />
       <div className="h-6" />
 
       <Table>
@@ -106,17 +111,6 @@ function OnlineBadge({ userId }: { userId: string }) {
   );
 }
 
-function useNow() {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-  return now;
-}
-
 export interface StageSelect {
   userId: string;
 }
@@ -151,5 +145,34 @@ function updateStage(index: number, userId: string) {
       if (index > -1) values[index] = userId;
       return values.join(",");
     }
+  );
+}
+
+export function TimerAdmin() {
+  const endTimePtr = getRoom().child("settings").child("timerEndTime");
+  const endTime = usePtr(endTimePtr).data;
+  return (
+    <div className="flex gap-2 items-center">
+      <Button
+        color="gray"
+        onClick={() => {
+          const minutes = prompt("Minutes");
+          if (minutes == null) {
+            return;
+          }
+          if (+minutes == 0) {
+            set(endTimePtr.ref, null);
+          } else {
+            const time = Date.now() + 1000 * 60 * +minutes;
+            set(endTimePtr.ref, time);
+          }
+        }}
+      >
+        Set Timer
+      </Button>
+      <div className="text-xl font-mono">
+        <Timer endTime={endTime} />
+      </div>
+    </div>
   );
 }

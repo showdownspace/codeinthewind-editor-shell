@@ -42,6 +42,7 @@ export const roomSchema = withDefault(
         acceptingSubmissions: withDefault(z.boolean(), false),
         stage: withDefault(z.string(), "-,-,-,-,-,-,-,-"),
         challengeUrl: z.string().nullish(),
+        timerEndTime: z.number().nullish(),
       }),
       {}
     ),

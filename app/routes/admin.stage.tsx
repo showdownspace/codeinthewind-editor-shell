@@ -2,12 +2,15 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import clsx from "clsx";
 import { Suspense, lazy, useState } from "react";
+import { usePtr } from "~/ZDbRef";
+import { getRoom } from "~/getRoomRef";
 import { Previewer } from "~/ui/Previewer";
+import { Timer } from "~/ui/Timer";
 import { useContestantHtml } from "../utils/useContestantHtml";
 import { useStage } from "../utils/useStage";
 
 const itemWidth = 360;
-const totalWidth = itemWidth * 4 + 32 * 3;
+// const totalWidth = itemWidth * 4 + 32 * 3;
 const itemHeight = 480;
 const totalHeight = itemHeight * 2 + 32;
 
@@ -19,12 +22,25 @@ export default function AdminStagePage() {
         {userIds.map((x, i) => {
           const row = Math.floor(i / 4);
           const col = i % 4;
-          const pX = (1920 - totalWidth) / 2 + col * (itemWidth + 32);
+          const pX = (1080 - totalHeight) / 2 + col * (itemWidth + 32);
           const pY = (1080 - totalHeight) / 2 + row * (itemHeight + 32);
           return <Slot key={i} userId={x} pX={pX} pY={pY} />;
         })}
+        <TimerView />
       </div>
     </div>
+  );
+}
+
+function TimerView() {
+  const endTimePtr = getRoom().child("settings").child("timerEndTime");
+  const endTime = usePtr(endTimePtr).data;
+  return (
+    <>
+      <div className="absolute top-[44px] right-[44px] h-[60px] w-[280px] flex flex-col items-center justify-center my-font-mono text-7xl">
+        <Timer endTime={endTime} />
+      </div>
+    </>
   );
 }
 
