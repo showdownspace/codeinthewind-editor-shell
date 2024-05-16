@@ -1,11 +1,14 @@
 import { useStore } from "@nanostores/react";
 import { redirect, useLoaderData } from "@remix-run/react";
 import { get, serverTimestamp, set } from "firebase/database";
+import { Button } from "flowbite-react";
 import { atom } from "nanostores";
 import { useEffect, useRef } from "react";
+import { usePtr } from "~/ZDbRef";
 import { getCurrentUser } from "~/getCurrentUser";
 import { UserId } from "~/ui/UserId";
 import { getRoom } from "../getRoomRef";
+import { ProfileConnector } from "../utils/ProfileConnector";
 
 const $status = atom("…");
 
@@ -156,18 +159,48 @@ export function Header() {
   const { user } = useLoaderData<typeof clientLoader>();
   return (
     <>
-      <div className="absolute top-2 left-5 pl-0.5">
-        <div className="text-sm">
-          <strong>Code in the Wind</strong>
-          <span className="text-gray-400"> - {status}</span>
-        </div>
-        <div className="text-sky-400">
-          {user.name}{" "}
-          <span className="text-green-400">
-            <UserId id={user.uid} compact />
-          </span>
+      <div className="absolute top-0 left-5 pl-0.5 h-[60px] flex items-center">
+        <div>
+          <div className="text-sm">
+            <strong>Code in the Wind</strong>
+            <span className="text-gray-400"> - {status}</span>
+          </div>
+          <div className="text-sky-400">
+            <ProfileConnector uid={user.uid}>
+              {(profile) => profile.displayName || profile.name || user.name}
+            </ProfileConnector>{" "}
+            <span className="text-green-400">
+              <UserId id={user.uid} compact />
+            </span>
+          </div>
         </div>
       </div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[60px] flex items-center">
+        <ChallengeButton />
+      </div>
+    </>
+  );
+}
+
+export function ChallengeButton() {
+  const challengeUrl = usePtr(
+    getRoom().child("settings").child("challengeUrl")
+  ).data;
+  return (
+    <>
+      {challengeUrl ? (
+        <Button
+          color="gray"
+          as="a"
+          href={challengeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View challenge
+        </Button>
+      ) : (
+        ""
+      )}
     </>
   );
 }

@@ -1,13 +1,4 @@
-import admin from "firebase-admin";
-import serviceAccount from "../creds.local/service-account.json";
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-  databaseURL:
-    "https://showdownspace-default-rtdb.asia-southeast1.firebasedatabase.app",
-});
-
-const db = admin.database();
+import { admin, db } from "./_lib";
 
 async function worker(uid: string) {
   for (;;) {

@@ -9,12 +9,12 @@ import {
 } from "@remix-run/react";
 import { get, set } from "firebase/database";
 import { Button, TextInput } from "flowbite-react";
-import { ReactNode, Suspense } from "react";
-import { usePtr } from "~/ZDbRef";
+import { Suspense } from "react";
 import { getRoom } from "~/getRoomRef";
 import { UserId } from "~/ui/UserId";
 import { getCurrentUser } from "../getCurrentUser";
 import { Container } from "../ui/Container";
+import { ProfileConnector } from "../utils/ProfileConnector";
 
 export const meta: MetaFunction = () => {
   return [
@@ -135,30 +135,5 @@ export default function Index() {
         </Form>
       </div>
     </Container>
-  );
-}
-
-export interface ProfileConnector {
-  uid: string;
-  children: (
-    profile: { displayName?: string; name?: string },
-    loading: boolean
-  ) => ReactNode;
-}
-
-export function ProfileConnector(props: ProfileConnector) {
-  const profilePtr = getRoom().child("profiles").child(props.uid);
-  const state = usePtr(profilePtr);
-  const data = state.data;
-  return (
-    <>
-      {props.children(
-        {
-          displayName: data?.displayName || undefined,
-          name: data?.name,
-        },
-        state.loading
-      )}
-    </>
   );
 }
