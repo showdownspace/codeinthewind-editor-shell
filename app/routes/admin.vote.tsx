@@ -75,7 +75,11 @@ function VoteList() {
       votes: tally.get(x) || [],
     }));
   }, [submissionsState]);
-  const value = votes.map((vote) => vote.votes.length).join("\n");
+  const scores = [25, 16, 9, 4, 3, 2, 1, 0];
+  const value = votes
+    .map((vote) => vote.votes.length)
+    .map((value, index, array) => scores[array.filter((v) => v > value).length])
+    .join("\n");
   return (
     <>
       <Table>
