@@ -22,7 +22,10 @@ export default function AdminUsersPage() {
     <>
       <StageDump users={users} showFullId={showFullId} />
       <div className="h-6" />
-      <TimerAdmin />
+      <div className="flex items-center gap-3 mb-4">
+        <SubmissionAcceptanceAdmin />
+        <TimerAdmin />
+      </div>
       <div className="h-6" />
 
       <Table>
@@ -174,5 +177,23 @@ export function TimerAdmin() {
         <Timer endTime={endTime} />
       </div>
     </div>
+  );
+}
+
+function SubmissionAcceptanceAdmin() {
+  const acceptingPtr = getRoom()
+    .child("settings")
+    .child("acceptingSubmissions");
+  const acceptingState = usePtr(acceptingPtr);
+  return (
+    <Select
+      value={acceptingState.data ? "true" : "false"}
+      onChange={(e) => {
+        set(acceptingPtr.ref, e.target.value === "true");
+      }}
+    >
+      <option value="true">Accepting</option>
+      <option value="false">Not Accepting</option>
+    </Select>
   );
 }
