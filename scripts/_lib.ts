@@ -32,10 +32,10 @@ export async function saveSnapshot() {
   return { id, path };
 }
 
-export function logEvent(name: string, payload: unknown) {
+export function logEvent(event: string, payload: Record<string, unknown>) {
   const dir = `private.local/events`;
   const file =
-    new Date().toISOString().replace(/\W/g, "") + "_" + name + ".json";
+    new Date().toISOString().replace(/\W/g, "") + "_" + event + ".json";
   mkdirSync(dir, { recursive: true });
-  writeFileSync(`${dir}/${file}`, JSON.stringify(payload, null, 2));
+  writeFileSync(`${dir}/${file}`, JSON.stringify({ event, payload }, null, 2));
 }
